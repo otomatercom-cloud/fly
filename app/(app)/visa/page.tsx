@@ -21,8 +21,8 @@ export default async function VisaPage() {
 
       {items.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {items.map((visa) => (
-            <VisaCard key={visa.id} visa={visa} />
+          {items.map((visa, i) => (
+            <VisaCard key={visa.id} visa={visa} index={i} />
           ))}
         </div>
       ) : (

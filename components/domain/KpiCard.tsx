@@ -7,11 +7,13 @@ export function KpiCard({
   value,
   icon: Icon,
   tone = "primary",
+  index = 0,
 }: {
   label: string;
   value: number;
   icon: LucideIcon;
   tone?: "primary" | "warning" | "danger";
+  index?: number;
 }) {
   const toneClasses = {
     primary: "bg-light-blue text-primary",
@@ -20,7 +22,11 @@ export function KpiCard({
   }[tone];
 
   return (
-    <Card className="flex items-center gap-3" padded>
+    <Card
+      className="flex items-center gap-3 animate-fade-in-up animate-stagger"
+      style={{ "--stagger-index": index } as React.CSSProperties}
+      padded
+    >
       <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-full", toneClasses)}>
         <Icon className="h-5 w-5" aria-hidden />
       </span>

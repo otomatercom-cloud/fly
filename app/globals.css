@@ -90,3 +90,60 @@ textarea {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+/* ==========================================================================
+   Motion — small, purposeful entrance animation for cards/lists and a
+   subtle sheen for promo banners. Respects reduced-motion.
+   ========================================================================== */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+/* Staggered entrance for a grid/list of cards — apply alongside
+   animate-fade-in-up and set --stagger-index on each item. */
+.animate-stagger {
+  animation-delay: calc(var(--stagger-index, 0) * 60ms);
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 2.8s ease-in-out infinite;
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.animate-soft-pulse {
+  animation: soft-pulse 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-shimmer,
+  .animate-soft-pulse {
+    animation: none !important;
+  }
+}

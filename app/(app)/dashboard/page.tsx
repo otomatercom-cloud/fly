@@ -6,7 +6,10 @@ import { CancellationAlertBanner } from "@/components/domain/CancellationAlertBa
 import { FlightRoute, FlightTimeMeta } from "@/components/domain/FlightRoute";
 import { KpiCard } from "@/components/domain/KpiCard";
 import { NotificationItem } from "@/components/domain/NotificationItem";
+import { PromoCarousel } from "@/components/domain/PromoCarousel";
 import { getDashboard, getMe } from "@/lib/odoo-client";
+import { cn } from "@/lib/utils";
+import { PASSPORT_STATUS_TONE, VISA_STATUS_TONE, toneAccent } from "@/lib/status-colors";
 import { Bell, CircleAlert, FileUp, Plane, Stamp, Globe } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -41,16 +44,19 @@ export default async function DashboardPage() {
         </div>
       )}
 
+      {/* Promotions — flight deals, visa/passport prompts, offers */}
+      <PromoCarousel />
+
       {/* KPI row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <KpiCard label="Upcoming Flights" value={data.kpis.upcoming_flights} icon={Plane} />
-        <KpiCard label="Active Visas" value={data.kpis.active_visas} icon={Globe} />
-        <KpiCard label="Pending Actions" value={data.kpis.pending_actions} icon={CircleAlert} tone="warning" />
-        <KpiCard label="Notifications" value={data.kpis.unread_notifications} icon={Bell} tone={data.kpis.unread_notifications > 0 ? "danger" : "primary"} />
+        <KpiCard label="Upcoming Flights" value={data.kpis.upcoming_flights} icon={Plane} index={0} />
+        <KpiCard label="Active Visas" value={data.kpis.active_visas} icon={Globe} index={1} />
+        <KpiCard label="Pending Actions" value={data.kpis.pending_actions} icon={CircleAlert} tone="warning" index={2} />
+        <KpiCard label="Notifications" value={data.kpis.unread_notifications} icon={Bell} tone={data.kpis.unread_notifications > 0 ? "danger" : "primary"} index={3} />
       </div>
 
       {/* 2. Next upcoming flight */}
-      <Card>
+      <Card className="animate-fade-in-up">
         <CardHeader>
           <CardTitle>Upcoming Flight</CardTitle>
         </CardHeader>
@@ -85,49 +91,61 @@ export default async function DashboardPage() {
 
       {/* 3 & 4. Visa / Passport status */}
       <div className="grid sm:grid-cols-2 gap-4">
-        <Card>
+        <Card className="animate-fade-in-up">
           <CardHeader>
             <CardTitle>Visa Status</CardTitle>
           </CardHeader>
           {data.visas.length > 0 ? (
-            <div className="space-y-4">
-              {data.visas.map((visa) => (
-                <div key={visa.id} className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-text-primary truncate">{visa.country}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <StatusBadge domain="visa" status={visa.status} />
-                      <DateDisplay iso={visa.expiry_date} className="text-xs text-text-secondary" />
+            <div className="space-y-2.5">
+              {data.visas.map((visa) => {
+                const accent = toneAccent(VISA_STATUS_TONE[visa.status] ?? "neutral");
+                return (
+                  <div
+                    key={visa.id}
+                    className={cn("flex items-center justify-between gap-3 rounded-lg border-l-4 p-2.5", accent.border, accent.bg)}
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-text-primary truncate">{visa.country}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <StatusBadge domain="visa" status={visa.status} />
+                        <DateDisplay iso={visa.expiry_date} className="text-xs text-text-secondary" />
+                      </div>
                     </div>
+                    <LinkButton href={`/visa/${visa.id}`} variant="secondary" size="sm">
+                      View
+                    </LinkButton>
                   </div>
-                  <LinkButton href={`/visa/${visa.id}`} variant="secondary" size="sm">
-                    View
-                  </LinkButton>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <EmptyState icon={Stamp} title="No active visas" />
           )}
         </Card>
 
-        <Card>
+        <Card className="animate-fade-in-up">
           <CardHeader>
             <CardTitle>Passport Status</CardTitle>
           </CardHeader>
           {data.passports.length > 0 ? (
-            <div className="space-y-4">
-              {data.passports.map((p) => (
-                <div key={p.id} className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-text-primary truncate">{p.passport_number}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <StatusBadge domain="passport" status={p.status} />
-                      <ExpiryCountdown iso={p.expiry_date} />
+            <div className="space-y-2.5">
+              {data.passports.map((p) => {
+                const accent = toneAccent(PASSPORT_STATUS_TONE[p.status] ?? "neutral");
+                return (
+                  <div
+                    key={p.id}
+                    className={cn("flex items-center justify-between gap-3 rounded-lg border-l-4 p-2.5", accent.border, accent.bg)}
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-text-primary truncate">{p.passport_number}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <StatusBadge domain="passport" status={p.status} />
+                        <ExpiryCountdown iso={p.expiry_date} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <EmptyState icon={Stamp} title="No passport on file" />
@@ -136,7 +154,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* 5. Important notifications */}
-      <Card>
+      <Card className="animate-fade-in-up">
         <CardHeader>
           <CardTitle>Important Notifications</CardTitle>
           <LinkButton href="/notifications" variant="ghost" size="sm">
@@ -155,7 +173,7 @@ export default async function DashboardPage() {
       </Card>
 
       {/* 6. Quick actions */}
-      <Card>
+      <Card className="animate-fade-in-up">
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
