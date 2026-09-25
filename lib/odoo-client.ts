@@ -5,18 +5,23 @@ import {
   getMockDashboard,
   MOCK_BOOKINGS,
   MOCK_CANCELLATION_REQUESTS,
+  MOCK_COUNTRIES,
   MOCK_DOCUMENTS,
   MOCK_NOTIFICATIONS,
   MOCK_PARTNER,
   MOCK_PASSPORTS,
   MOCK_VISAS,
+  MOCK_VISA_TYPES,
   toBookingSummary,
 } from "./mock-data";
 import type {
   Booking,
   BookingDetail,
   CancellationRequest,
+  Country,
   DashboardData,
+  NewPassportInput,
+  NewVisaInput,
   Notification,
   Paginated,
   Partner,
@@ -24,6 +29,7 @@ import type {
   TravelDocument,
   Visa,
   VisaDetail,
+  VisaTypeOption,
 } from "@/types/api";
 
 export class ApiError extends Error {
@@ -249,6 +255,59 @@ export async function getVisaDetail(id: number): Promise<VisaDetail> {
   return withSession((sessionId) => odooFetch<VisaDetail>(`/api/flt/visas/${id}`, { sessionId }));
 }
 
+export async function createVisa(input: NewVisaInput): Promise<VisaDetail> {
+  if (IS_MOCK_MODE) {
+    await mockDelay(600);
+    const passport = MOCK_PASSPORTS.find((p) => p.id === input.passport_id);
+    const country = MOCK_COUNTRIES.find((c) => c.code === input.country_code);
+    if (!passport || !country) throw new ApiError("Invalid passport or country.", 400, "invalid_input");
+    const visa: VisaDetail = {
+      id: Math.floor(Math.random() * 100000),
+      name: "FLT/VISA/" + Math.floor(Math.random() * 900000 + 100000),
+      country: country.name,
+      country_code: country.code,
+      visa_type: input.visa_type,
+      expiry_date: input.expiry_date ?? null,
+      status: "draft",
+      visa_number: input.visa_number ?? null,
+      issue_date: input.issue_date ?? null,
+      renewal_date: input.renewal_date ?? null,
+      entry_type: input.entry_type ?? "single",
+      number_of_entries: input.number_of_entries ?? 1,
+      passport_number: passport.passport_number,
+      document_count: 0,
+    };
+    MOCK_VISAS.push(visa);
+    return visa;
+  }
+  return withSession((sessionId) =>
+    odooFetch<VisaDetail>("/api/flt/visas", { method: "POST", sessionId, body: JSON.stringify(input) })
+  );
+}
+
+export async function uploadVisaDocument(visaId: number, formData: FormData): Promise<VisaDetail> {
+  if (IS_MOCK_MODE) {
+    await mockDelay(800);
+    const visa = MOCK_VISAS.find((v) => v.id === visaId);
+    if (!visa) throw new ApiError("Not found.", 404, "not_found");
+    visa.document_count += 1;
+    return visa;
+  }
+  return withSession((sessionId) =>
+    fetch(`${ODOO_BASE_URL}/api/flt/visas/${visaId}/documents`, {
+      method: "POST",
+      headers: { Cookie: `session_id=${sessionId}` },
+      body: formData,
+    }).then(async (res) => {
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new ApiError(body?.error?.message || "Upload failed.", res.status, body?.error?.code || "upload_failed");
+      }
+      return res.json();
+    })
+  );
+}
+
 // ============================= PASSPORT ==============================
 export async function getPassports(): Promise<{ items: Passport[] }> {
   if (IS_MOCK_MODE) {
@@ -256,6 +315,75 @@ export async function getPassports(): Promise<{ items: Passport[] }> {
     return { items: MOCK_PASSPORTS };
   }
   return withSession((sessionId) => odooFetch<{ items: Passport[] }>("/api/flt/passports", { sessionId }));
+}
+
+export async function createPassport(input: NewPassportInput): Promise<Passport> {
+  if (IS_MOCK_MODE) {
+    await mockDelay(600);
+    if (!input.passport_number || !input.full_name || !input.issue_date || !input.expiry_date) {
+      throw new ApiError("Passport number, full name, issue date and expiry date are required.", 400, "invalid_input");
+    }
+    const country = MOCK_COUNTRIES.find((c) => c.code === input.nationality_code);
+    const passport: Passport = {
+      id: Math.floor(Math.random() * 100000),
+      passport_number: input.passport_number,
+      full_name: input.full_name,
+      date_of_birth: input.date_of_birth ?? null,
+      nationality: country?.name ?? null,
+      nationality_code: country?.code ?? null,
+      issue_date: input.issue_date,
+      expiry_date: input.expiry_date,
+      place_of_issue: input.place_of_issue ?? null,
+      notes: input.notes ?? null,
+      status: "draft",
+      document_count: 0,
+    };
+    MOCK_PASSPORTS.push(passport);
+    return passport;
+  }
+  return withSession((sessionId) =>
+    odooFetch<Passport>("/api/flt/passports", { method: "POST", sessionId, body: JSON.stringify(input) })
+  );
+}
+
+export async function uploadPassportDocument(passportId: number, formData: FormData): Promise<Passport> {
+  if (IS_MOCK_MODE) {
+    await mockDelay(800);
+    const passport = MOCK_PASSPORTS.find((p) => p.id === passportId);
+    if (!passport) throw new ApiError("Not found.", 404, "not_found");
+    passport.document_count += 1;
+    return passport;
+  }
+  return withSession((sessionId) =>
+    fetch(`${ODOO_BASE_URL}/api/flt/passports/${passportId}/documents`, {
+      method: "POST",
+      headers: { Cookie: `session_id=${sessionId}` },
+      body: formData,
+    }).then(async (res) => {
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new ApiError(body?.error?.message || "Upload failed.", res.status, body?.error?.code || "upload_failed");
+      }
+      return res.json();
+    })
+  );
+}
+
+// ============================= COUNTRIES ==============================
+export async function getCountries(): Promise<{ items: Country[] }> {
+  if (IS_MOCK_MODE) {
+    await mockDelay(150);
+    return { items: MOCK_COUNTRIES };
+  }
+  return withSession((sessionId) => odooFetch<{ items: Country[] }>("/api/flt/countries", { sessionId }));
+}
+
+export async function getVisaTypes(): Promise<{ items: VisaTypeOption[] }> {
+  if (IS_MOCK_MODE) {
+    await mockDelay(150);
+    return { items: MOCK_VISA_TYPES };
+  }
+  return withSession((sessionId) => odooFetch<{ items: VisaTypeOption[] }>("/api/flt/visa-types", { sessionId }));
 }
 
 // ============================ DOCUMENTS ===============================

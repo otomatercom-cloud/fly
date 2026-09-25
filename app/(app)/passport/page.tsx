@@ -1,8 +1,9 @@
 import { Alert, EmptyState } from "@/components/ui";
+import { LinkButton } from "@/components/ui/Button";
 import { PassportCard } from "@/components/domain/PassportCard";
 import { daysUntil } from "@/components/ui/format";
 import { getPassports } from "@/lib/odoo-client";
-import { Stamp } from "lucide-react";
+import { Plus, Stamp } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "My Passports" };
@@ -16,7 +17,12 @@ export default async function PassportPage() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-xl sm:text-2xl font-semibold text-text-primary">My Passports</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-semibold text-text-primary">My Passports</h1>
+        <LinkButton href="/passport/new" size="sm" icon={<Plus className="h-4 w-4" />}>
+          Add Passport
+        </LinkButton>
+      </div>
 
       {expiringSoon.map((p) => (
         <Alert key={p.id} tone="warning" title={`Passport ${p.passport_number} expiring soon`}>
@@ -31,7 +37,16 @@ export default async function PassportPage() {
           ))}
         </div>
       ) : (
-        <EmptyState icon={Stamp} title="No passports on file" description="Your passport records will appear here once added." />
+        <EmptyState
+          icon={Stamp}
+          title="No passports on file"
+          description="Add your passport to keep it on record and start visa applications."
+          action={
+            <LinkButton href="/passport/new" size="sm">
+              Add Passport
+            </LinkButton>
+          }
+        />
       )}
     </div>
   );

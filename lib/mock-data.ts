@@ -3,12 +3,14 @@ import type {
   Booking,
   BookingDetail,
   CancellationRequest,
+  Country,
   DashboardData,
   Notification,
   Partner,
   Passport,
   TravelDocument,
   VisaDetail,
+  VisaTypeOption,
 } from "@/types/api";
 
 // A single demo customer standing in for the real Odoo-backed customer
@@ -183,6 +185,7 @@ export const MOCK_VISAS: VisaDetail[] = [
     entry_type: "multiple",
     number_of_entries: 0,
     passport_number: "P1234567",
+    document_count: 1,
   },
   {
     id: 2002,
@@ -198,6 +201,7 @@ export const MOCK_VISAS: VisaDetail[] = [
     entry_type: "single",
     number_of_entries: 1,
     passport_number: "P1234567",
+    document_count: 1,
   },
 ];
 
@@ -206,11 +210,34 @@ export const MOCK_PASSPORTS: Passport[] = [
     id: 3001,
     passport_number: "P1234567",
     full_name: "Rahul Kumar",
+    date_of_birth: isoDate(-11000),
     nationality: "India",
+    nationality_code: "IN",
     issue_date: isoDate(-2200),
     expiry_date: isoDate(1460),
+    place_of_issue: "New Delhi",
+    notes: null,
     status: "valid",
+    document_count: 1,
   },
+];
+
+export const MOCK_VISA_TYPES: VisaTypeOption[] = [
+  { value: "tourist", label: "Tourist" },
+  { value: "business", label: "Business" },
+  { value: "student", label: "Student" },
+  { value: "work", label: "Work" },
+  { value: "transit", label: "Transit" },
+  { value: "resident", label: "Resident" },
+];
+
+export const MOCK_COUNTRIES: Country[] = [
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "IN", name: "India" },
+  { code: "SA", name: "Saudi Arabia" },
+  { code: "SG", name: "Singapore" },
+  { code: "US", name: "United States" },
 ];
 
 export const MOCK_DOCUMENTS: TravelDocument[] = [

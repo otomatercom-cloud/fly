@@ -123,16 +123,56 @@ export interface VisaDetail extends Visa {
   entry_type: string;
   number_of_entries: number;
   passport_number: string | null;
+  document_count: number;
 }
 
 export interface Passport {
   id: number;
   passport_number: string;
   full_name: string;
+  date_of_birth: string | null;
   nationality: string | null;
+  nationality_code: string | null;
   issue_date: string | null;
   expiry_date: string | null;
+  place_of_issue: string | null;
+  notes: string | null;
   status: PassportStatus;
+  document_count: number;
+}
+
+export interface Country {
+  code: string;
+  name: string;
+}
+
+export interface VisaTypeOption {
+  value: string;
+  label: string;
+}
+
+export interface NewPassportInput {
+  passport_number: string;
+  full_name: string;
+  date_of_birth?: string;
+  nationality_code?: string;
+  issue_date: string;
+  expiry_date: string;
+  place_of_issue?: string;
+  notes?: string;
+}
+
+export interface NewVisaInput {
+  passport_id: number;
+  country_code: string;
+  visa_type: string;
+  visa_number?: string;
+  issue_date?: string;
+  expiry_date?: string;
+  renewal_date?: string;
+  entry_type?: "single" | "double" | "multiple";
+  number_of_entries?: number;
+  notes?: string;
 }
 
 export interface TravelDocument {
