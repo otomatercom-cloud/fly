@@ -1,14 +1,12 @@
-"use client";
-
-import { useActionState } from "react";
 import { Plane, ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui";
-import { loginAction, type LoginState } from "./actions";
+import { LoginForm } from "@/components/domain/LoginForm";
+import type { Metadata } from "next";
 
-const initialState: LoginState = { error: null };
+export const metadata: Metadata = { title: "Sign In" };
 
-export default function LoginPage() {
-  const [state, formAction, pending] = useActionState(loginAction, initialState);
+export default async function LoginPage(props: PageProps<"/login">) {
+  const searchParams = await props.searchParams;
+  const notice = searchParams.created === "1" ? "Account created. Please sign in." : undefined;
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -46,51 +44,7 @@ export default function LoginPage() {
           <h1 className="text-2xl font-semibold text-text-primary">Welcome back</h1>
           <p className="mt-1 text-sm text-text-secondary">Sign in to your FLT account</p>
 
-          <form action={formAction} className="mt-8 space-y-5">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-1.5">
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                required
-                className="w-full min-h-11 rounded-lg border border-border px-3.5 text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                placeholder="you@example.com"
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-1.5">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="w-full min-h-11 rounded-lg border border-border px-3.5 text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                placeholder="••••••••"
-              />
-            </div>
-
-            {state.error && (
-              <p role="alert" className="rounded-lg bg-danger-bg px-3.5 py-2.5 text-sm text-danger">
-                {state.error}
-              </p>
-            )}
-
-            <Button type="submit" fullWidth size="lg" loading={pending}>
-              Sign In
-            </Button>
-          </form>
-
-          <a href="#" className="mt-4 block text-center text-sm text-primary hover:underline">
-            Forgot password?
-          </a>
+          <LoginForm notice={notice} />
         </div>
       </div>
     </div>

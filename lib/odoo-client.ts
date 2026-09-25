@@ -96,6 +96,39 @@ export async function login(loginEmail: string, password: string): Promise<{ ses
   return { sessionId: data.session_id, partner: data.partner };
 }
 
+export async function signup(
+  name: string,
+  loginEmail: string,
+  password: string,
+  phone: string
+): Promise<{ sessionId: string; partner: Partner }> {
+  if (IS_MOCK_MODE) {
+    await mockDelay(600);
+    if (!name || !loginEmail || !password) {
+      throw new ApiError("Name, email and password are required.", 400, "invalid_input");
+    }
+    if (password.length < 8) {
+      throw new ApiError("Password must be at least 8 characters.", 400, "weak_password");
+    }
+    // In mock mode there's nothing to persist against — every signup just
+    // succeeds and signs the person in as the same demo customer.
+    return { sessionId: "mock-session-" + Date.now(), partner: { ...MOCK_PARTNER, name, email: loginEmail } };
+  }
+  const data = await odooFetch<{ session_id: string | null; partner?: Partner; created?: boolean }>(
+    "/api/flt/auth/signup",
+    {
+      method: "POST",
+      body: JSON.stringify({ name, login: loginEmail, password, phone }),
+    }
+  );
+  if (!data.session_id || !data.partner) {
+    // Account was created but auto-login didn't happen (see api.py) —
+    // caller falls back to sending them to /login.
+    throw new ApiError("Account created. Please sign in.", 202, "signup_created_needs_login");
+  }
+  return { sessionId: data.session_id, partner: data.partner };
+}
+
 export async function logout(): Promise<void> {
   if (IS_MOCK_MODE) return;
   await withSession((sessionId) => odooFetch("/api/flt/auth/logout", { method: "POST", sessionId }));
