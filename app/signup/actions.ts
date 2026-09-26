@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { ApiError, signup as odooSignup } from "@/lib/odoo-client";
-import { setSessionId } from "@/lib/session";
+import { clearSessionId, setSessionId } from "@/lib/session";
 
 export type SignupState = { error: string | null };
 
@@ -22,6 +22,11 @@ export async function signupAction(_prevState: SignupState, formData: FormData):
   if (password !== confirmPassword) {
     return { error: "Passwords don't match." };
   }
+
+  // Same isolation guard as loginAction: a signup also mints a fresh
+  // application session, so any pre-existing (possibly another user's
+  // stale) flt_session cookie must not survive into it.
+  await clearSessionId();
 
   try {
     const { sessionId } = await odooSignup(name, email, password, phone);

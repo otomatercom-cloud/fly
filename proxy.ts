@@ -15,11 +15,14 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (hasSession && (pathname === "/login" || pathname === "/signup")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
-  }
+  // Deliberately NOT redirecting /login or /signup away just because a
+  // flt_session cookie is present: the middleware can only see that a
+  // cookie exists, not whether it's still valid at Odoo or belongs to
+  // whoever is sitting at the browser right now. A stale (or another
+  // user's still-live) cookie must never bounce a fresh visitor straight
+  // into /dashboard without going through authentication — that was the
+  // multi-user session leak. Private routes stay fully protected by the
+  // check above; only the auto-skip-past-login convenience is removed.
 
   return NextResponse.next();
 }
