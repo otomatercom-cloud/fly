@@ -3,12 +3,14 @@
 import { logoutAction } from "@/app/login/logout-action";
 import { cn } from "@/lib/utils";
 import type { Partner } from "@/types/api";
-import { Bell, ChevronDown, LogOut, Plane, User } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Menu, PanelLeft, Plane, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useNav } from "./nav-context";
 
 export function TopBar({ partner, unreadCount }: { partner: Partner; unreadCount: number }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { openDrawer, toggleCollapsed } = useNav();
   const initials = partner.name
     .split(" ")
     .map((p) => p[0])
@@ -18,15 +20,32 @@ export function TopBar({ partner, unreadCount }: { partner: Partner; unreadCount
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border bg-card/95 backdrop-blur px-4 sm:px-6">
-      {/* Mobile-only compact logo (sidebar carries it on desktop) */}
-      <Link href="/dashboard" className="flex items-center gap-2 lg:hidden">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <Plane className="h-4 w-4 text-white" />
-        </div>
-        <span className="text-sm font-semibold text-text-primary">FLT</span>
-      </Link>
+      <div className="flex items-center gap-2">
+        {/* Mobile: opens the off-canvas drawer */}
+        <button
+          onClick={openDrawer}
+          aria-label="Open menu"
+          className="lg:hidden flex h-10 w-10 items-center justify-center rounded-full hover:bg-light-blue text-text-secondary"
+        >
+          <Menu className="h-5 w-5" aria-hidden />
+        </button>
+        {/* Desktop: collapse/expand the sidebar */}
+        <button
+          onClick={toggleCollapsed}
+          aria-label="Toggle sidebar"
+          className="hidden lg:flex h-10 w-10 items-center justify-center rounded-full hover:bg-light-blue text-text-secondary"
+        >
+          <PanelLeft className="h-5 w-5" aria-hidden />
+        </button>
 
-      <div className="hidden lg:block" />
+        {/* Mobile-only compact logo (sidebar carries it on desktop) */}
+        <Link href="/dashboard" className="flex items-center gap-2 lg:hidden">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <Plane className="h-4 w-4 text-white" />
+          </div>
+          <span className="text-sm font-semibold text-text-primary">FLT</span>
+        </Link>
+      </div>
 
       <div className="flex items-center gap-2">
         <Link

@@ -7,31 +7,42 @@
    generated via @theme) instead.
    ========================================================================== */
 :root {
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-navy: #0f172a;
-  --color-secondary: #3b82f6;
-  --color-light-blue: #eff6ff;
-  --color-background: #f8fafc;
-  --color-card: #ffffff;
-  --color-border: #e2e8f0;
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #64748b;
-  --color-success: #16a34a;
-  --color-success-bg: #f0fdf4;
-  --color-warning: #f59e0b;
-  --color-warning-bg: #fffbeb;
-  --color-danger: #dc2626;
-  --color-danger-bg: #fef2f2;
-  --color-info: #2563eb;
-  --color-info-bg: #eff6ff;
+  /* Modern SaaS admin-dashboard palette (visual system only — same token
+     names components already reference, values updated). */
+  --color-primary: #087cf0;
+  --color-primary-hover: #0668cc;
+  --color-navy: #07122f; /* sidebar-bg */
+  --color-secondary: #087cf0;
+  --color-light-blue: #eaf4ff; /* primary-light */
+  --color-background: #f7f9fc; /* page-bg */
+  --color-card: #ffffff; /* surface */
+  --color-border: #e8edf4;
+  --color-text-primary: #111827;
+  --color-text-secondary: #7d8799;
+  --color-text-muted: #9aa3b3;
+  --color-success: #08c85a;
+  --color-success-bg: #e7faf0;
+  --color-warning: #ff7600;
+  --color-warning-bg: #fff3e8;
+  --color-danger: #e11d48;
+  --color-danger-bg: #fdecef;
+  --color-info: #087cf0;
+  --color-info-bg: #eaf4ff;
+  --color-accent-purple: #9744ed;
+  --color-accent-purple-bg: #f4ebfe;
+
+  /* Sidebar-specific text tones (light-on-dark navy — distinct from the
+     rest of the light-surface app, which uses --color-text-*). */
+  --color-sidebar-text: #b9c3d5;
+  --color-sidebar-muted: #66738c;
+  --color-sidebar-active: #087cf0;
 
   /* Self-hosted via @fontsource-variable/inter (imported in app/layout.tsx),
      not next/font/google — see that file for why. */
   --font-inter: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 0.75rem;
-  --radius-control: 0.5rem;
+  --radius-card: 1.125rem;
+  --radius-control: 0.625rem;
 
   --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06);
   --shadow-card-hover: 0 4px 6px -1px rgb(15 23 42 / 0.06), 0 2px 4px -2px rgb(15 23 42 / 0.06);
@@ -48,6 +59,7 @@
   --color-border: var(--color-border);
   --color-text-primary: var(--color-text-primary);
   --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
   --color-success: var(--color-success);
   --color-success-bg: var(--color-success-bg);
   --color-warning: var(--color-warning);
@@ -56,6 +68,11 @@
   --color-danger-bg: var(--color-danger-bg);
   --color-info: var(--color-info);
   --color-info-bg: var(--color-info-bg);
+  --color-accent-purple: var(--color-accent-purple);
+  --color-accent-purple-bg: var(--color-accent-purple-bg);
+  --color-sidebar-text: var(--color-sidebar-text);
+  --color-sidebar-muted: var(--color-sidebar-muted);
+  --color-sidebar-active: var(--color-sidebar-active);
   --font-sans: var(--font-inter);
 }
 

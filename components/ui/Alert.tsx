@@ -26,7 +26,7 @@ export function Alert({
 }) {
   const { icon: Icon, classes } = config[tone];
   return (
-    <div className={cn("flex gap-3 rounded-xl border p-4", classes, className)} role="alert">
+    <div className={cn("flex gap-3 rounded-2xl border p-4", classes, className)} role="alert">
       <Icon className="h-5 w-5 flex-shrink-0 mt-0.5" aria-hidden />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold">{title}</p>

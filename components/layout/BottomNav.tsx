@@ -1,12 +1,21 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BOTTOM_NAV_ITEMS } from "./nav-items";
+import { BOTTOM_NAV_ITEMS, DRAWER_EXTRA_ITEMS } from "./nav-items";
+import { useNav } from "./nav-context";
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { openDrawer, drawerOpen } = useNav();
+
+  // "More" is highlighted when the active route lives in the drawer-only
+  // list, so a page like Profile or Notifications still shows *something*
+  // active in the bottom bar instead of nothing being highlighted.
+  const moreActive =
+    drawerOpen || DRAWER_EXTRA_ITEMS.some((item) => pathname === item.href || pathname.startsWith(item.href + "/"));
 
   return (
     <nav
@@ -33,6 +42,21 @@ export function BottomNav() {
             </li>
           );
         })}
+        <li>
+          <button
+            type="button"
+            onClick={openDrawer}
+            aria-haspopup="dialog"
+            aria-expanded={drawerOpen}
+            className={cn(
+              "flex w-full flex-col items-center justify-center gap-1 py-2.5 min-h-14 text-[11px] font-medium",
+              moreActive ? "text-primary" : "text-text-secondary"
+            )}
+          >
+            <Menu className="h-5 w-5" aria-hidden />
+            More
+          </button>
+        </li>
       </ul>
     </nav>
   );

@@ -1,4 +1,6 @@
 import { BottomNav } from "@/components/layout/BottomNav";
+import { MobileDrawer } from "@/components/layout/MobileDrawer";
+import { NavProvider } from "@/components/layout/nav-context";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { ApiError, getMe, getNotifications } from "@/lib/odoo-client";
@@ -27,15 +29,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const unreadCount = notifications.items.filter((n) => !n.is_read).length;
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <div className="flex flex-1 flex-col min-w-0">
-        <TopBar partner={partner} unreadCount={unreadCount} />
-        <main className="flex-1 px-4 py-5 pb-24 sm:px-6 sm:py-6 lg:pb-6 max-w-6xl w-full mx-auto">
-          {children}
-        </main>
-        <BottomNav />
+    <NavProvider>
+      <div className="flex min-h-screen">
+        <Sidebar />
+        <div className="flex flex-1 flex-col min-w-0">
+          <TopBar partner={partner} unreadCount={unreadCount} />
+          <main className="flex-1 px-4 py-5 pb-24 sm:px-6 sm:py-6 lg:pb-6 max-w-6xl w-full mx-auto">
+            {children}
+          </main>
+          <BottomNav />
+        </div>
+        <MobileDrawer />
       </div>
-    </div>
+    </NavProvider>
   );
 }
